@@ -42,6 +42,7 @@ app.get('/users', helpers.checkAuth, user.getAll);
 app.get('/users/:id', helpers.checkAuth, user.getById);
 app.post('/users', helpers.checkAuth, user.create);
 app.put('/users/:id', helpers.checkAuth, user.update);
+app.put('/users/password/:id', helpers.checkAuth, user.changePassword);
 app.del('/users/:id', helpers.checkAuth, user.del);
 //post routes
 app.get('/posts', helpers.checkAuth, post.getAll);

@@ -30,9 +30,10 @@ module.exports = function(sequelize, DataTypes) {
           callback(error)
         });
       },
-      createUser: function(params, callback){
+      createUser: function(params, hash, callback){
         this.create({
           name: (params.name) ? params.name: '',
+          password: hash,
           email: (params.email) ? params.email: '',
         }).success(function(user){
           callback(user);
@@ -41,10 +42,24 @@ module.exports = function(sequelize, DataTypes) {
         });
       },
       updateUser: function(id, params, callback){
-        this.find({where: {id: id}, attributes: ['id', 'name', 'email']}).success(function(user){
+        this.find({where: {id: id}, attributes: ['id', 'name', 'email', 'password']}).success(function(user){
           user.updateAttributes({
             name: (params.name) ? params.name: user.name,
             email: (params.email) ? params.email: user.email,
+            password: user.password
+          }).success(function(user){
+            callback(user);
+          }).error(function(error){
+            callback(error)
+          });
+        });
+      },
+      changePassword: function(id, params, hash, callback){
+        this.find({where: {id: id}, attributes: ['id', 'name', 'email', 'password']}).success(function(user){
+          user.updateAttributes({
+            name: (params.name) ? params.name: user.name,
+            email: (params.email) ? params.email: user.email,
+            password: hash
           }).success(function(user){
             callback(user);
           }).error(function(error){

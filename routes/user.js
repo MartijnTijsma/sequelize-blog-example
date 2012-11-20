@@ -15,9 +15,21 @@ exports.getById = function(req, res){
 };
 
 exports.create = function(req, res){
-  db.User.createUser(req.body, function(user){
-    helpers.sendResponse(user, req, res);
-  });
+  if(req.body && req.body.name && req.body.password){
+    var hash = helpers.hash(req);
+    db.User.createUser(req.body, hash, function(user){
+      helpers.sendResponse(user, req, res);
+    });
+  }
+}
+
+exports.changePassword = function(req, res){
+  if(req.params.id && req.body && req.body.password){
+    var hash = helpers.hash(req);
+    db.User.changePassword(req.params.id, req.body, hash, function(user){
+      helpers.sendResponse(user, req, res);
+    });
+  }
 }
 
 exports.update = function(req, res){
