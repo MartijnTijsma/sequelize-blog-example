@@ -1,17 +1,15 @@
 
-/**
- * Module dependencies.
- */
-
+// Module dependencies
 var express = require('express')
   , http = require('http')
   , path = require('path')
   , fs = require('fs')
+  , helpers = require('./myHelpers')
   , routes = require('./routes')
   , user = require('./routes/user')
-  , post = require('./routes/post')
-  ;
+  , post = require('./routes/post');
 
+// configure express
 var app = express();
 
 app.configure(function(){
@@ -22,8 +20,11 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.cookieParser('your secret here'));
-  app.use(express.session());
+  app.use(express.cookieParser('this is a secret'));
+  app.use(express.session({
+    secret  : "Stays my secret",
+    cookie: {maxAge  : 3600000}
+  }));
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
 });
@@ -33,27 +34,25 @@ app.configure('development', function(){
 });
 
 //routes
-app.get('/', routes.index);
+app.get('/', helpers.checkAuth, routes.index);
+app.post('/login', user.login);
+app.post('/logout', user.logout);
 //user routes
-app.get('/users', user.getAll);
-app.get('/users/:id', user.getById);
-app.post('/users', user.create);
-app.put('/users/:id', user.update);
-app.del('/users/:id', user.del);
+app.get('/users', helpers.checkAuth, user.getAll);
+app.get('/users/:id', helpers.checkAuth, user.getById);
+app.post('/users', helpers.checkAuth, user.create);
+app.put('/users/:id', helpers.checkAuth, user.update);
+app.del('/users/:id', helpers.checkAuth, user.del);
 //post routes
-app.get('/posts', post.getAll);
-app.get('/posts/:id', post.getById);
-app.post('/posts', post.create);
-app.put('/posts/:id', post.update);
-app.del('/posts/:id', post.del);
+app.get('/posts', helpers.checkAuth, post.getAll);
+app.get('/posts/:id', helpers.checkAuth, post.getById);
+app.post('/posts', helpers.checkAuth, post.create);
+app.put('/posts/:id', helpers.checkAuth, post.update);
+app.del('/posts/:id', helpers.checkAuth, post.del);
 //not found
 app.get('/*', function(req, res){
   res.send(404, 'page not found')
 });
-
-function sendInvalidRequest(req, res){
-  res.send(400, "Invalid request")
-}
 
 
 http.createServer(app).listen(app.get('port'), function(){
