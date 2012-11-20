@@ -23,7 +23,7 @@ app.configure(function(){
   app.use(express.cookieParser('this is a secret'));
   app.use(express.session({
     secret  : "Stays my secret",
-    cookie: {maxAge  : 3600000}
+    cookie: {expires: new Date(Date.now() + 3600000)}
   }));
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
